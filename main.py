@@ -15,10 +15,9 @@ from fn import draw_single
 from Track.Tracker import Detection, Tracker
 from ActionsEstLoader import TSSTG
 
-# source = '../Data/test_video/test7.mp4'
-# source = '../Data/falldata/Home/Videos/video (2).avi'  # hard detect
-source = "../Data/falldata/Home/Videos/video (1).avi"
-# source = 2
+source = 2 # 2 for usb_cam
+
+SAVE_FRAME_RATE = 20  # 20 is good and 30 is too fast
 
 
 def preproc(image):
@@ -84,6 +83,9 @@ if __name__ == "__main__":
     par.add_argument(
         "--device", type=str, default="cpu", help="Device to run model on cpu or cuda."
     )
+    par.add_argument(
+        "--show_fps", default=False, action="store_true", help="Show FPS of program."
+    )
     args = par.parse_args()
 
     device = args.device
@@ -121,16 +123,18 @@ if __name__ == "__main__":
     # frame_size = cam.frame_size
     # scf = torch.min(inp_size / torch.FloatTensor([frame_size]), 1)[0]
 
-    outvid = False
+    is_video_out = False
     if args.save_out != "":
-        outvid = True
-        codec = cv2.VideoWriter_fourcc(*"MJPG")
-        writer = cv2.VideoWriter(args.save_out, codec, 30, (inp_dets * 2, inp_dets * 2))
+        is_video_out = True
+        codec = cv2.VideoWriter_fourcc(*"mp4v")
+        writer = cv2.VideoWriter(
+            args.save_out, codec, SAVE_FRAME_RATE, (inp_dets * 2, inp_dets * 2)
+        )
 
     fps_time = 0
-    f = 0
+    whole_frame = 0
     while cam.grabbed():
-        f += 1
+        whole_frame += 1
         frame = cam.getitem()
         image = frame.copy()
 
@@ -227,27 +231,36 @@ if __name__ == "__main__":
 
         # Show Frame.
         frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
+        text = " "
+
+        if args.show_fps:
+            text = "%d, FPS: %f" % (whole_frame, 1.0 / (time.time() - fps_time))
+
         frame = cv2.putText(
             frame,
-            "%d, FPS: %f" % (f, 1.0 / (time.time() - fps_time)),
+            text,
             (10, 20),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
             (0, 255, 0),
             1,
         )
+
         frame = frame[:, :, ::-1]
         fps_time = time.time()
 
-        if outvid:
+        if is_video_out:
             writer.write(frame)
 
-        cv2.imshow("frame", frame)
+        if not is_video_out:
+            # disable show frame when --save_out used.
+            cv2.imshow("frame", frame)
+
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
 
     # Clear resource.
     cam.stop()
-    if outvid:
+    if is_video_out:
         writer.release()
     cv2.destroyAllWindows()
