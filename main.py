@@ -15,7 +15,7 @@ from fn import draw_single
 from Track.Tracker import Detection, Tracker
 from ActionsEstLoader import TSSTG
 
-source = 2 # 2 for usb_cam
+source = 2  # 2 for usb_cam
 
 SAVE_FRAME_RATE = 20  # 20 is good and 30 is too fast
 
