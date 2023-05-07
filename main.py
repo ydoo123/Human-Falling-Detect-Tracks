@@ -17,7 +17,16 @@ from ActionsEstLoader import TSSTG
 import json
 
 
-ACTION_DICT = {"pending..": 0, "Fall Down": 1, "Lying Down": 2}
+ACTION_DICT = {
+    "pending..": 0,
+    "Standing": 0,
+    "Walking": 0,
+    "Sitting": 0,
+    "Lying Down": 2,
+    "Stand up": 0,
+    "Sit down": 0,
+    "Fall Down": 1,
+}
 # get url from url.json
 with open("url.json") as f:
     URL = json.load(f)
@@ -276,13 +285,12 @@ if __name__ == "__main__":
             Check action every 0.1 second.
             Send coordinate to server if action is "Fall Down"
             """
-            np.append(action_history, ACTION_DICT[action_name])
+
+            action_history = np.append(action_history, ACTION_DICT[action_name])
             action_history = action_history[1:]
 
-            if np.count_nonzero(action_history == 0) < ACTION_COUNT_VALUE:
-                # If there are fewer 0 (default) in the array, it means it has fallen
-                # It would be easier to count 0 than to count 1 and 2.
-                send_coord(bbox)
+            if np.count_nonzero(action_history) >= ACTION_COUNT_VALUE:
+                print("Fall Down")
 
             prev_time = time.time()
 
