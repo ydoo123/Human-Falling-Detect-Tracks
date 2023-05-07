@@ -72,7 +72,7 @@ if __name__ == "__main__":
     par = argparse.ArgumentParser(description="Human Fall Detection Demo.")
     par.add_argument(
         "-C",
-        "--camera",
+        "--cam",
         default=source,  # required=True,  # default=2,
         help="Source of camera or video file path.",
     )
