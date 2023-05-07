@@ -15,9 +15,19 @@ from fn import draw_single
 from Track.Tracker import Detection, Tracker
 from ActionsEstLoader import TSSTG
 
+
+ACTION_DICT = {"pending..": 0, "Fall Down": 1, "Lying Down": 2}
+
 source = 2  # 2 for usb_cam
 
 SAVE_FRAME_RATE = 20  # 20 is good and 30 is too fast
+ACTION_CHECK_RATE = 0.1  # to check action every 0.1 second
+ACTION_COUNT_VALUE = 5
+
+
+def send_coord():
+    print("send_coord")
+    return None
 
 
 def preproc(image):
@@ -89,6 +99,10 @@ if __name__ == "__main__":
     args = par.parse_args()
 
     device = args.device
+
+    # for check action
+    prev_time = time.time()
+    action_history = np.zeros(20)
 
     # DETECTION MODEL.
     inp_dets = args.detection_input_size
@@ -248,6 +262,21 @@ if __name__ == "__main__":
 
         frame = frame[:, :, ::-1]
         fps_time = time.time()
+
+        if time.time() - prev_time > ACTION_CHECK_RATE:
+            """
+            Check action every 0.1 second.
+            Send coordinate to server if action is "Fall Down"
+            """
+            action_history.append(ACTION_DICT[action_name])
+            action_history = action_history[1:]
+
+            if action_history.count(0) < ACTION_COUNT_VALUE:
+                # If there are fewer 0 (default) in the array, it means it has fallen
+                # It would be easier to count 0 than to count 1 and 2.
+                send_coord()
+
+            prev_time = time.time()
 
         if is_video_out:
             writer.write(frame)
