@@ -72,7 +72,7 @@ if __name__ == "__main__":
     par = argparse.ArgumentParser(description="Human Fall Detection Demo.")
     par.add_argument(
         "-C",
-        "--cam",
+        "--camera",
         default=source,  # required=True,  # default=2,
         help="Source of camera or video file path.",
     )
@@ -144,7 +144,7 @@ if __name__ == "__main__":
     cam_source = args.camera
     if type(cam_source) is str and os.path.isfile(cam_source):
         # Use loader thread with Q for video file.
-        cam = CamLoader_Q(cam_source, queue_size=1000, preprocess=preproc).start()
+        cam = CamLoader_Q(cam_source, queue_size=3000, preprocess=preproc).start()
     else:
         # Use normal thread loader for webcam.
         cam = CamLoader(
