@@ -280,7 +280,7 @@ if __name__ == "__main__":
         frame = frame[:, :, ::-1]
         fps_time = time.time()
 
-        if time.time() - prev_time > ACTION_CHECK_RATE:
+        if time.time() - prev_time >= ACTION_CHECK_RATE:
             """
             Check action every 0.1 second.
             Send coordinate to server if action is "Fall Down"
@@ -289,7 +289,7 @@ if __name__ == "__main__":
             action_history = np.append(action_history, ACTION_DICT[action_name])
             action_history = action_history[1:]
 
-            if np.count_nonzero(action_history) >= ACTION_COUNT_VALUE:
+            if np.count_nonzero(action_history == 0) <= ACTION_COUNT_VALUE:
                 print("Fall Down")
 
             prev_time = time.time()
