@@ -15,6 +15,7 @@ from fn import draw_single
 from Track.Tracker import Detection, Tracker
 from ActionsEstLoader import TSSTG
 import json
+import requests
 
 
 ACTION_DICT = {
@@ -27,6 +28,7 @@ ACTION_DICT = {
     "Sit down": 0,
     "Fall Down": 1,
 }
+
 # get url from url.json
 with open("url.json") as f:
     URL = json.load(f)
@@ -41,8 +43,25 @@ ACTION_COUNT_VALUE = 5
 
 def send_coord(bbox):
     # calculate center of bbox
-    coord = (bbox[0] + bbox[2]) / 2
-    print(coord)
+    cam_id = 0
+    x = (bbox[0] + bbox[2]) / 2
+    y = (bbox[1] + bbox[3]) / 2
+    theta = 0.0
+    w = 0.0
+
+    # coord = ((bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2)
+
+    if args.test:
+        x = 0
+        y = 0
+
+    # post coord to server
+    r = requests.post(
+        URL + "/upload_dest",
+        json={"cam_id": cam_id, "x": x, "y": y, "theta": theta, "w": w},
+    )
+    print(r.status_code, r.reason)
+    print(x, y)
     return None
 
 
@@ -112,6 +131,7 @@ if __name__ == "__main__":
     par.add_argument(
         "--show_fps", default=False, action="store_true", help="Show FPS of program."
     )
+    par.add_argument("--test", default=False, action="store_true", help="Test mode.")
     args = par.parse_args()
 
     device = args.device
