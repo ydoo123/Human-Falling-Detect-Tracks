@@ -41,6 +41,11 @@ ACTION_CHECK_RATE = 0.1  # to check action every 0.1 second
 ACTION_COUNT_VALUE = 5
 
 
+def beep():
+    os.system('say "넘어짐이 감지되었습니다."')
+    return None
+
+
 def send_coord(bbox):
     # calculate center of bbox
     cam_id = 0
