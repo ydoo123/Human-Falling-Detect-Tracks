@@ -286,11 +286,12 @@ if __name__ == "__main__":
             Send coordinate to server if action is "Fall Down"
             """
 
-            action_history = np.append(action_history, ACTION_DICT[action_name])
-            action_history = action_history[1:]
+            action_history = np.roll(action_history, -1)
+            action_history[-1] = ACTION_DICT[action_name]
 
             if np.count_nonzero(action_history == 0) <= ACTION_COUNT_VALUE:
                 print("Fall Down")
+                time.sleep(5)
 
             prev_time = time.time()
 
