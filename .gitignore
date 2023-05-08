@@ -3,4 +3,5 @@ Models/
 Videos/
 .DS_Store
 url.json
+test_*.py
 ```
