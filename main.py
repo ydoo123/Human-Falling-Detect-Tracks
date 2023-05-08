@@ -72,7 +72,7 @@ if __name__ == "__main__":
     par = argparse.ArgumentParser(description="Human Fall Detection Demo.")
     par.add_argument(
         "-C",
-        "--camera",
+        "--cam",
         default=source,  # required=True,  # default=2,
         help="Source of camera or video file path.",
     )
@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
     resize_fn = ResizePadding(inp_dets, inp_dets)
 
-    cam_source = args.camera
+    cam_source = args.cam
     if type(cam_source) is str and os.path.isfile(cam_source):
         # Use loader thread with Q for video file.
         cam = CamLoader_Q(cam_source, queue_size=3000, preprocess=preproc).start()
