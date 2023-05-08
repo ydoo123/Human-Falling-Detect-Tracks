@@ -145,6 +145,7 @@ if __name__ == "__main__":
     prev_time = time.time()
     action_history = np.zeros(20)
     action_name = "pending.."
+    count = 0
 
     # DETECTION MODEL.
     inp_dets = args.detection_input_size
@@ -314,9 +315,13 @@ if __name__ == "__main__":
             action_history = np.roll(action_history, -1)
             action_history[-1] = ACTION_DICT[action_name]
 
-            if np.count_nonzero(action_history == 0) <= ACTION_COUNT_VALUE:
+            if (
+                np.count_nonzero(action_history == 0) <= ACTION_COUNT_VALUE
+                and count == 0
+            ):
+                count += 1
                 print("Fall Down")
-                time.sleep(5)
+                beep()
 
             prev_time = time.time()
 
