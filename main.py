@@ -16,6 +16,7 @@ from Track.Tracker import Detection, Tracker
 from ActionsEstLoader import TSSTG
 import json
 import requests
+import playsound
 
 
 ACTION_DICT = {
@@ -43,7 +44,7 @@ ACTION_CHECK_TIME = 15
 
 
 def beep():
-    os.system('say "넘어짐이 감지되었습니다."')
+    playsound.playsound('TTS/fall_detect_voice.mp3', True)
     return None
 
 
