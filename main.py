@@ -38,7 +38,8 @@ source = 2  # 2 for usb_cam
 
 SAVE_FRAME_RATE = 20  # 20 is good and 30 is too fast
 ACTION_CHECK_RATE = 0.1  # to check action every 0.1 second
-ACTION_COUNT_VALUE = 5
+ACTION_COUNT_VALUE = 3
+ACTION_CHECK_TIME = 15
 
 
 def beep():
@@ -143,7 +144,7 @@ if __name__ == "__main__":
 
     # for check action
     prev_time = time.time()
-    action_history = np.zeros(20)
+    action_history = np.zeros(ACTION_CHECK_TIME)
     action_name = "pending.."
     count = 0
 
@@ -320,6 +321,7 @@ if __name__ == "__main__":
                 and count == 0
             ):
                 count += 1
+                action_history = np.zeros(ACTION_COUNT_VALUE)
                 print("Fall Down")
                 beep()
 
