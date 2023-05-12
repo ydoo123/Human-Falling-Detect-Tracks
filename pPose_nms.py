@@ -12,9 +12,9 @@ delta1 = 1
 mu = 1.7
 delta2 = 2.65
 gamma = 22.48
-scoreThreds = 0.3
-matchThreds = 5
-areaThres = 0  # 40 * 40.5
+scoreThreads = 0.3
+matchThreads = 5
+areaThreads = 0  # 40 * 40.5
 alpha = 0.1
 # pool = ThreadPool(4)
 
@@ -65,9 +65,9 @@ def pose_nms(bboxes, bbox_scores, pose_preds, pose_scores):
         simi = get_parametric_distance(pick_id, pose_preds, pose_scores, ref_dist)
         num_match_keypoints = PCK_match(pose_preds[pick_id], pose_preds, ref_dist)
 
-        # Delete humans who have more than matchThreds keypoints overlap and high similarity
+        # Delete humans who have more than matchThreads keypoints overlap and high similarity
         delete_ids = torch.from_numpy(np.arange(human_scores.shape[0]))[
-            (simi > gamma) | (num_match_keypoints >= matchThreds)
+            (simi > gamma) | (num_match_keypoints >= matchThreads)
         ]
 
         if delete_ids.shape[0] == 0:
@@ -94,7 +94,7 @@ def pose_nms(bboxes, bbox_scores, pose_preds, pose_scores):
         ids = np.arange(pose_preds.shape[1])
         max_score = torch.max(scores_pick[j, ids, 0])
 
-        if max_score < scoreThreds:
+        if max_score < scoreThreads:
             continue
 
         # Merge poses
@@ -107,7 +107,7 @@ def pose_nms(bboxes, bbox_scores, pose_preds, pose_scores):
         )
 
         max_score = torch.max(merge_score[ids])
-        if max_score < scoreThreds:
+        if max_score < scoreThreads:
             continue
 
         xmax = max(merge_pose[:, 0])
@@ -115,7 +115,7 @@ def pose_nms(bboxes, bbox_scores, pose_preds, pose_scores):
         ymax = max(merge_pose[:, 1])
         ymin = min(merge_pose[:, 1])
 
-        if 1.5**2 * (xmax - xmin) * (ymax - ymin) < areaThres:
+        if 1.5**2 * (xmax - xmin) * (ymax - ymin) < areaThreads:
             continue
 
         final_result.append(
@@ -139,7 +139,7 @@ def filter_result(args):
     ids = np.arange(17)
     max_score = torch.max(score_pick[ids, 0])
 
-    if max_score < scoreThreds:
+    if max_score < scoreThreads:
         return None
 
     # Merge poses
@@ -148,7 +148,7 @@ def filter_result(args):
     )
 
     max_score = torch.max(merge_score[ids])
-    if max_score < scoreThreds:
+    if max_score < scoreThreads:
         return None
 
     xmax = max(merge_pose[:, 0])
