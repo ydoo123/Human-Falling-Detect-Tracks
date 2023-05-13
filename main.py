@@ -16,7 +16,8 @@ from Track.Tracker import Detection, Tracker
 from ActionsEstLoader import TSSTG
 import json
 import requests
-import playsound
+
+# import playsound
 
 
 ACTION_DICT = {
@@ -44,7 +45,9 @@ ACTION_CHECK_TIME = 15
 
 
 def beep():
-    playsound.playsound('TTS/fall_detect_voice.mp3', True)
+    # playsound.playsound('TTS/fall_detect_voice.mp3', True)
+    os.system('say "넘어짐이 감지되었습니다."')
+
     return None
 
 
@@ -53,7 +56,7 @@ def send_coord(bbox):
     cam_id = 0
     x = (bbox[0] + bbox[2]) / 2
     y = (bbox[1] + bbox[3]) / 2
-    theta = 0.0
+    z = 0.0
     w = 0.0
 
     # coord = ((bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2)
@@ -65,7 +68,7 @@ def send_coord(bbox):
     # post coord to server
     r = requests.post(
         URL + "/upload_dest",
-        json={"cam_id": cam_id, "x": x, "y": y, "theta": theta, "w": w},
+        json={"cam_id": cam_id, "x": x, "y": y, "z": z, "w": w},
     )
     print(r.status_code, r.reason)
     print(x, y)
@@ -325,6 +328,7 @@ if __name__ == "__main__":
                 action_history = np.zeros(ACTION_COUNT_VALUE)
                 print("Fall Down")
                 beep()
+                send_coord(bbox)
 
             prev_time = time.time()
 
