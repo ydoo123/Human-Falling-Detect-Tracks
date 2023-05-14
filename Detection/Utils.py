@@ -142,7 +142,6 @@ def get_batch_statistics(outputs, targets, iou_threshold):
     """Compute true positives, predicted scores and predicted labels per sample"""
     batch_metrics = []
     for sample_i in range(len(outputs)):
-
         if outputs[sample_i] is None:
             continue
 
@@ -162,7 +161,6 @@ def get_batch_statistics(outputs, targets, iou_threshold):
             for pred_i, (pred_box, pred_label) in enumerate(
                 zip(pred_boxes, pred_labels)
             ):
-
                 # If targets are found break
                 if len(detected_boxes) == len(annotations):
                     break
@@ -381,8 +379,8 @@ def ResizePadding(height, width):
         image = cv2.resize(image, (new_size[1], new_size[0]))
         delta_w = desized_size[1] - new_size[1]
         delta_h = desized_size[0] - new_size[0]
-        top, bottom = delta_h // 2, delta_h - (delta_h // 2)
-        left, right = delta_w // 2, delta_w - (delta_w // 2)
+        top, bottom = delta_h // 2, delta_h - (delta_h // 2)  # top: 84, bottom: 84
+        left, right = delta_w // 2, delta_w - (delta_w // 2)  # left: 0, right: 0
 
         image = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT)
         return image

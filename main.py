@@ -16,6 +16,7 @@ from Track.Tracker import Detection, Tracker
 from ActionsEstLoader import TSSTG
 import json
 import requests
+import uuid
 
 # import playsound
 
@@ -48,6 +49,25 @@ def beep():
     # playsound.playsound('TTS/fall_detect_voice.mp3', True)
     os.system('say "넘어짐이 감지되었습니다."')
 
+    return None
+
+
+def save_photo():
+    PATH = "photo"
+    uuid_str = str(uuid.uuid4()) + ".jpg"
+    photo_path = os.path.join(PATH, uuid_str)
+    cv2.imwrite(photo_path, frame)
+
+    return photo_path
+
+
+def upload_photo():
+    photo_path = save_photo()
+
+    # post photo to server
+    files = {"file": open(photo_path, "rb")}
+    r = requests.post(URL + "/upload_photo", files=files)
+    print(r.status_code, r.reason)
     return None
 
 
@@ -170,7 +190,7 @@ if __name__ == "__main__":
     # Actions Estimate.
     action_model = TSSTG()
 
-    resize_fn = ResizePadding(inp_dets, inp_dets)
+    resize_fn = ResizePadding(inp_dets, inp_dets)  # inp_dets is 384
 
     cam_source = args.cam
     if type(cam_source) is str and os.path.isfile(cam_source):
@@ -329,6 +349,7 @@ if __name__ == "__main__":
                 print("Fall Down")
                 beep()
                 send_coord(bbox)
+                # upload_photo()
 
             prev_time = time.time()
 
