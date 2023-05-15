@@ -14,10 +14,10 @@ MAP_PATH = os.path.join(UPPER_PATH, "Map")
 YAML_FILE = os.path.join(MAP_PATH, "map_112_0510.yaml")
 # Load the YAML file
 with open(YAML_FILE, "r") as stream:
-    data = yaml.safe_load(stream)
+    map_data = yaml.safe_load(stream)
 
 # Open the PGM file
-IMG_PATH = os.path.join(MAP_PATH, data["image"])
+IMG_PATH = os.path.join(MAP_PATH, map_data["image"])
 img = Image.open(IMG_PATH)
 
 # get the map config[[[]]]
@@ -39,10 +39,10 @@ with open(CAM_CONFIG_PATH, "r") as f:
 width, height = img.size
 
 # Get the origin
-origin = data["origin"]
+origin = map_data["origin"]
 origin_coord = (
-    -origin[0] / data["resolution"],
-    height - (-origin[1] / data["resolution"]),
+    -origin[0] / map_data["resolution"],
+    height - (-origin[1] / map_data["resolution"]),
 )
 
 
@@ -82,7 +82,7 @@ def get_center(head_x, head_y, body_x, body_y):
     return center_x, center_y
 
 
-def get_inverse_coord(head_coord, body_coord, ratio=2.0):
+def get_inverse_coord(head_coord, body_coord, meter=1.5):
     midpoint = (
         (head_coord[0] + body_coord[0]) / 2,
         (head_coord[1] + body_coord[1]) / 2,
@@ -101,6 +101,8 @@ def get_inverse_coord(head_coord, body_coord, ratio=2.0):
     length = (
         (body_coord[0] - head_coord[0]) ** 2 + (body_coord[1] - head_coord[1]) ** 2
     ) ** 0.5
+
+    ratio = meter / (length * map_data["resolution"])
 
     length *= ratio
 
@@ -140,8 +142,8 @@ def convert_pixel_to_real_coord(pixel_coord):
     return: (real_x, real_y)
     """
     # func(origin_coord) = (0, 0)
-    real_x = (pixel_coord[0] - origin_coord[0]) * data["resolution"]
-    real_y = (pixel_coord[1] - origin_coord[1]) * data["resolution"]
+    real_x = (pixel_coord[0] - origin_coord[0]) * map_data["resolution"]
+    real_y = (pixel_coord[1] - origin_coord[1]) * map_data["resolution"]
 
     return real_x, real_y
 
