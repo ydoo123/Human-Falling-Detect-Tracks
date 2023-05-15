@@ -69,7 +69,7 @@ def get_center(head_x, head_y, body_x, body_y):
     return center_x, center_y
 
 
-def get_inverse_coord(head_coord, body_coord, ratio=1.0):
+def get_inverse_coord(head_coord, body_coord, ratio=2.0):
     midpoint = (
         (head_coord[0] + body_coord[0]) / 2,
         (head_coord[1] + body_coord[1]) / 2,
@@ -91,10 +91,32 @@ def get_inverse_coord(head_coord, body_coord, ratio=1.0):
 
     length *= ratio
 
-    x_inverse = midpoint[0] + (length / 2) * (1 / (1 + perp_slope**2)) ** 0.5
-    y_inverse = perp_slope * x_inverse + y_intercept
+    x_inverse_1 = midpoint[0] + (length / 2) * (1 / (1 + perp_slope**2)) ** 0.5
+    y_inverse_1 = perp_slope * x_inverse_1 + y_intercept
 
-    return (x_inverse, y_inverse)
+    x_inverse_2 = midpoint[0] - (length / 2) * (1 / (1 + perp_slope**2)) ** 0.5
+    y_inverse_2 = perp_slope * x_inverse_2 + y_intercept
+
+    inverse_coord = [[x_inverse_1, y_inverse_1], [x_inverse_2, y_inverse_2]]
+    return inverse_coord
+
+
+def select_short_coord(inverse_coord, origin):
+    inverse_coord_1 = inverse_coord[0]
+    inverse_coord_2 = inverse_coord[1]
+
+    # get the distance between the origin and the inverse coord
+    distance_1 = (
+        (inverse_coord_1[0] - origin[0]) ** 2 + (inverse_coord_1[1] - origin[1]) ** 2
+    ) ** 0.5
+    distance_2 = (
+        (inverse_coord_2[0] - origin[0]) ** 2 + (inverse_coord_2[1] - origin[1]) ** 2
+    ) ** 0.5
+
+    if distance_1 <= distance_2:
+        return inverse_coord_1
+
+    return inverse_coord_2
 
 
 def get_rotation():
@@ -126,7 +148,12 @@ def main():
     map_head_coord = convert_coord(head_coord)
     map_body_coord = convert_coord(body_coord)
 
-    inverse_coord = get_inverse_coord(map_head_coord, map_body_coord)
+    inverse_coord = get_inverse_coord(
+        map_head_coord,
+        map_body_coord,
+    )
+
+    inverse_coord = select_short_coord(inverse_coord, origin)
 
     ax.scatter(
         map_head_coord[0],
@@ -144,7 +171,7 @@ def main():
         inverse_coord[0],
         inverse_coord[1],
         marker="x",
-        color="yellow",
+        color="orange",
     )
 
     plt.axis("scaled")
