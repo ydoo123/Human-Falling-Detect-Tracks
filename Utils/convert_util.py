@@ -20,7 +20,7 @@ with open(YAML_FILE, "r") as stream:
 IMG_PATH = os.path.join(MAP_PATH, data["image"])
 img = Image.open(IMG_PATH)
 
-# get the map config
+# get the map config[[[]]]
 CONFIG_PATH = os.path.join(MAP_PATH, "map_config.json")
 with open(CONFIG_PATH, "r") as f:
     map_config_data = json.load(f)
@@ -148,6 +148,25 @@ def convert_pixel_to_real_coord(pixel_coord):
 
 def get_rotation():
     return None
+
+
+def get_real_coord(head_coord, body_coord):
+    """
+    This is the main function to get the real coordinate
+    """
+    map_head_coord = convert_coord(head_coord)
+    map_body_coord = convert_coord(body_coord)
+
+    inverse_coord = get_inverse_coord(
+        map_head_coord,
+        map_body_coord,
+    )
+
+    inverse_coord = select_short_coord(inverse_coord, origin_coord)
+
+    x, y = convert_pixel_to_real_coord(inverse_coord)
+
+    return x, y
 
 
 def main():
