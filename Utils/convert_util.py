@@ -5,6 +5,8 @@ import os
 import json
 import numpy as np
 import cv2
+import quaternion
+import math
 
 
 # Define the YAML file path
@@ -20,7 +22,7 @@ with open(YAML_FILE, "r") as stream:
 IMG_PATH = os.path.join(MAP_PATH, map_data["image"])
 img = Image.open(IMG_PATH)
 
-# get the map config[[[]]]
+# get the map config
 CONFIG_PATH = os.path.join(MAP_PATH, "map_config.json")
 with open(CONFIG_PATH, "r") as f:
     map_config_data = json.load(f)
@@ -148,8 +150,16 @@ def convert_pixel_to_real_coord(pixel_coord):
     return real_x, real_y
 
 
-def get_rotation():
-    return None
+def get_rotation(start_coord, end_coord):
+    # get the angle
+    dx = end_coord[0] - start_coord[0]
+    dy = end_coord[1] - start_coord[1]
+    rads = math.atan2(dy, dx)
+
+    # calculate the angle in quaternion
+    q = quaternion.from_euler_angles(0, 0, rads)  # w, x, y, z
+
+    return q.w, q.z
 
 
 def get_real_coord(head_coord, body_coord):
@@ -164,11 +174,16 @@ def get_real_coord(head_coord, body_coord):
         map_body_coord,
     )
 
+    center_coord = get_center(
+        map_head_coord[0], map_head_coord[1], map_body_coord[0], map_body_coord[1]
+    )
+
     inverse_coord = select_short_coord(inverse_coord, origin_coord)
 
+    w, z = get_rotation(inverse_coord, center_coord)
     x, y = convert_pixel_to_real_coord(inverse_coord)
 
-    return x, y
+    return x, y, z, w
 
 
 def main():
@@ -220,6 +235,9 @@ def main():
     print("real_dest: ", real_dest)
 
     plt.axis("scaled")
+
+    x, y, z, w = get_real_coord(head_coord, body_coord)
+    print(f"x: {x}, y: {y}, z: {z}, w: {w}")
     plt.show()
 
     # Save the plot as a PNG file

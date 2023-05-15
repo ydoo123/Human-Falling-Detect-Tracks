@@ -17,6 +17,7 @@ from ActionsEstLoader import TSSTG
 import json
 import requests
 import uuid
+from Utils.convert_util import get_real_coord
 
 # import playsound
 
@@ -71,15 +72,11 @@ def upload_photo():
     return None
 
 
-def send_coord(bbox):
+def send_coord(x, y, z, w):
     # calculate center of bbox
     cam_id = 0
-    x = (bbox[0] + bbox[2]) / 2
-    y = (bbox[1] + bbox[3]) / 2
     z = 0.0
     w = 0.0
-
-    # coord = ((bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2)
 
     if args.test:
         x = 0
@@ -91,7 +88,7 @@ def send_coord(bbox):
         json={"cam_id": cam_id, "x": x, "y": y, "z": z, "w": w},
     )
     print(r.status_code, r.reason)
-    print(x, y)
+    print(f"upload complete: {x}, {y}, {z}, {w}")
     return None
 
 
@@ -353,12 +350,14 @@ if __name__ == "__main__":
                 count += 1
                 action_history = np.zeros(ACTION_COUNT_VALUE)
                 print("Fall Down")
-                head_coord = tracker.tracks[0].keypoints_list[-1][0][:2]
-                body_coord = tracker.tracks[0].keypoints_list[-1][8][:2]
+                head_coord = tracker.tracks[0].keypoints_list[-1][0][:2].tolist()
+                body_coord = tracker.tracks[0].keypoints_list[-1][8][:2].tolist()
+
+                x, y, z, w = get_real_coord(head_coord, body_coord)
+
                 print(head_coord, body_coord)
                 beep()
-
-                # send_coord(bbox)
+                send_coord(x, y, z, w)
                 # upload_photo()
 
             prev_time = time.time()
