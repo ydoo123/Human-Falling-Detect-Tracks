@@ -35,7 +35,7 @@ with open(CAM_CONFIG_PATH, "r") as f:
     cam_config_data = json.load(f)
     cam_vertices = np.array(cam_config_data["vertices"], np.float32)
     # rotate the cam_vertices
-    cam_vertices = np.roll(cam_vertices, 1, axis=0)
+    # cam_vertices = np.roll(cam_vertices, 1, axis=0)
 
 
 def get_head_body_coord():
@@ -82,13 +82,12 @@ def convert_coord(coord):
     """
     transformation_matrix = cv2.getPerspectiveTransform(cam_vertices, map_vertices)
 
-    point_cam = np.array([[coord[0], coord[1]]], dtype=np.float32)
-    point_map_transformed = cv2.transform(
-        point_cam.reshape(1, -1, 2), transformation_matrix
-    )
-
-    map_transformed_x = point_map_transformed[0][0][0]
-    map_transformed_y = point_map_transformed[0][0][1]
+    # convert the coordinate
+    cam_transformed_x, cam_transformed_y = coord[0], coord[1]
+    map_transformed_x, map_transformed_y = cv2.perspectiveTransform(
+        np.array([[[cam_transformed_x, cam_transformed_y]]], dtype=np.float32),
+        transformation_matrix,
+    )[0][0]
 
     return (map_transformed_x, map_transformed_y)
 

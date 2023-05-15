@@ -3,8 +3,10 @@ import cv2
 import numpy as np
 import json
 
-global dragging, vertices
-dragging = None
+global dragging_vertex, vertices, dots, dragging_dot
+dragging_vertex = None
+dragging_dot = None
+dots = [(200, 200), (100, 100)]
 
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 UPPER_PATH = os.path.dirname(CURRENT_PATH)
@@ -17,16 +19,23 @@ with open(CAM_CONFIG_PATH, "r") as f:
 
 
 def mouse_callback(event, x, y, flags, param):
-    global vertices, dragging
+    global vertices, dragging_vertex, dragging_dot
     if event == cv2.EVENT_LBUTTONDOWN:
         for i, vertex in enumerate(vertices):
             if np.sqrt((vertex[0] - x) ** 2 + (vertex[1] - y) ** 2) < 10:
-                dragging = i
+                dragging_vertex = i
+        for j, dot in enumerate(dots):
+            if np.sqrt((dot[0] - x) ** 2 + (dot[1] - y) ** 2) < 10:
+                dragging_dot = j
     elif event == cv2.EVENT_MOUSEMOVE:
-        if dragging is not None:
-            vertices[dragging] = [x, y]
+        if dragging_vertex is not None:
+            vertices[dragging_vertex] = [x, y]
+        if dragging_dot is not None:
+            dots[dragging_dot] = [x, y]
+
     elif event == cv2.EVENT_LBUTTONUP:
-        dragging = None
+        dragging_vertex = None
+        dragging_dot = None
 
 
 def resizePadding(image, desized_size):
@@ -72,7 +81,7 @@ def main():
     img = frame
 
     while True:
-        print(vertices)
+        print(f"dots: {dots}")
         cv2.setMouseCallback("frame", mouse_callback)
 
         # Copy the original image to display the quadrilateral on top of it
@@ -80,6 +89,20 @@ def main():
 
         # Draw the quadrilateral
         cv2.polylines(img_display, [vertices], True, (0, 0, 255), thickness=2)
+        # put the name of the vertices
+        for i, vertex in enumerate(vertices):
+            cv2.putText(
+                img_display,
+                f"{i}",
+                tuple(vertex),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 0, 255),
+                2,
+            )
+
+        cv2.circle(img_display, tuple(dots[0]), 5, (255, 0, 0), -1)
+        cv2.circle(img_display, tuple(dots[1]), 5, (0, 255, 0), -1)
 
         # Display the image
         cv2.imshow("frame", img_display)

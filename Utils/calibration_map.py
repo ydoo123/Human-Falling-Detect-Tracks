@@ -34,6 +34,10 @@ fig, ax = plt.subplots()
 rectangle = plt.Polygon(vertices, closed=True, fill=False, linewidth=2)
 ax.add_patch(rectangle)
 
+# put the text of the vertices
+for i, vertex in enumerate(vertices):
+    ax.text(vertex[0], vertex[1], str(i), color="orange", fontsize=20)
+
 
 def mouse_callback(event):
     global vertices, dragging
