@@ -75,12 +75,6 @@ def upload_photo():
 def send_coord(x, y, z, w):
     # calculate center of bbox
     cam_id = 0
-    z = 0.0
-    w = 0.0
-
-    if args.test:
-        x = 0
-        y = 0
 
     # post coord to server
     r = requests.post(
