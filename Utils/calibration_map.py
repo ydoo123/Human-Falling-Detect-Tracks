@@ -8,20 +8,22 @@ import numpy as np
 global vertices, dragging
 dragging = None
 
+
 # Define the YAML file path
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-MAP_DIR = os.path.join(CURRENT_DIR, "Map")
-YAML_FILE = os.path.join(MAP_DIR, "map_112_0510.yaml")
+CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
+UPPER_PATH = os.path.dirname(CURRENT_PATH)
+MAP_PATH = os.path.join(UPPER_PATH, "Map")
+YAML_FILE = os.path.join(MAP_PATH, "map_112_0510.yaml")
 # Load the YAML file
 with open(YAML_FILE, "r") as stream:
     data = yaml.safe_load(stream)
 
 # Open the PGM file
-IMG_PATH = os.path.join(MAP_DIR, data["image"])
+IMG_PATH = os.path.join(MAP_PATH, data["image"])
 img = Image.open(IMG_PATH)
 
 # get the map config
-CONFIG_PATH = os.path.join(MAP_DIR, "map_config.json")
+CONFIG_PATH = os.path.join(MAP_PATH, "map_config.json")
 with open(CONFIG_PATH, "r") as f:
     config_data = json.load(f)
     vertices = np.array(config_data["vertices"], np.int32)

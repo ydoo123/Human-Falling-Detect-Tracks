@@ -1,7 +1,5 @@
 import os
 import cv2
-import time
-import argparse
 import numpy as np
 import json
 
@@ -9,7 +7,8 @@ global dragging, vertices
 dragging = None
 
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
-CAM_CONFIG_PATH = os.path.join(CURRENT_PATH, "MAP", "cam_config.json")
+UPPER_PATH = os.path.dirname(CURRENT_PATH)
+CAM_CONFIG_PATH = os.path.join(UPPER_PATH, "MAP", "cam_config.json")
 
 # get vertices from json file
 with open(CAM_CONFIG_PATH, "r") as f:
