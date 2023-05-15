@@ -340,6 +340,12 @@ if __name__ == "__main__":
             action_history = np.roll(action_history, -1)
             action_history[-1] = ACTION_DICT[action_name]
 
+            # if tracker.tracks[0].keypoints_list:
+            #     head_coord = tracker.tracks[0].keypoints_list[-1][0]
+            #     print(head_coord)
+            #     body_coord = tracker.tracks[0].keypoints_list[-1][8]
+            #     print(body_coord)
+
             if (
                 np.count_nonzero(action_history == 0) <= ACTION_COUNT_VALUE
                 and count == 0
@@ -347,8 +353,12 @@ if __name__ == "__main__":
                 count += 1
                 action_history = np.zeros(ACTION_COUNT_VALUE)
                 print("Fall Down")
+                head_coord = tracker.tracks[0].keypoints_list[-1][0][:2]
+                body_coord = tracker.tracks[0].keypoints_list[-1][8][:2]
+                print(head_coord, body_coord)
                 beep()
-                send_coord(bbox)
+
+                # send_coord(bbox)
                 # upload_photo()
 
             prev_time = time.time()

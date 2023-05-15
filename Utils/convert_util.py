@@ -31,6 +31,19 @@ CAM_CONFIG_PATH = os.path.join(MAP_PATH, "cam_config.json")
 with open(CAM_CONFIG_PATH, "r") as f:
     cam_config_data = json.load(f)
     cam_vertices = np.array(cam_config_data["vertices"], np.float32)
+    # rotate the cam_vertices
+    cam_vertices = np.roll(cam_vertices, 1, axis=0)
+
+
+# get the image size
+width, height = img.size
+
+# Get the origin
+origin = data["origin"]
+origin_coord = (
+    -origin[0] / data["resolution"],
+    height - (-origin[1] / data["resolution"]),
+)
 
 
 fig, ax = plt.subplots()
@@ -101,16 +114,18 @@ def get_inverse_coord(head_coord, body_coord, ratio=2.0):
     return inverse_coord
 
 
-def select_short_coord(inverse_coord, origin):
+def select_short_coord(inverse_coord, origin_coord):
     inverse_coord_1 = inverse_coord[0]
     inverse_coord_2 = inverse_coord[1]
 
     # get the distance between the origin and the inverse coord
     distance_1 = (
-        (inverse_coord_1[0] - origin[0]) ** 2 + (inverse_coord_1[1] - origin[1]) ** 2
+        (inverse_coord_1[0] - origin_coord[0]) ** 2
+        + (inverse_coord_1[1] - origin_coord[1]) ** 2
     ) ** 0.5
     distance_2 = (
-        (inverse_coord_2[0] - origin[0]) ** 2 + (inverse_coord_2[1] - origin[1]) ** 2
+        (inverse_coord_2[0] - origin_coord[0]) ** 2
+        + (inverse_coord_2[1] - origin_coord[1]) ** 2
     ) ** 0.5
 
     if distance_1 <= distance_2:
@@ -119,31 +134,35 @@ def select_short_coord(inverse_coord, origin):
     return inverse_coord_2
 
 
+def convert_pixel_to_real_coord(pixel_coord):
+    """
+    convert the pixel coordinate to real coordinate(meter, meter)
+    return: (real_x, real_y)
+    """
+    # func(origin_coord) = (0, 0)
+    real_x = (pixel_coord[0] - origin_coord[0]) * data["resolution"]
+    real_y = (pixel_coord[1] - origin_coord[1]) * data["resolution"]
+
+    return real_x, real_y
+
+
 def get_rotation():
     return None
 
 
 def main():
-    # Get the origin
-    origin = data["origin"]
-
-    # get the image size
-    width, height = img.size
-
-    # Plot the image and origin
-
     ax.imshow(img, cmap="gray")
     ax.scatter(
-        -origin[0] / data["resolution"],
-        height - (-origin[1] / data["resolution"]),
+        origin_coord[0],
+        origin_coord[1],
         marker="+",
         color="red",
     )
     ax.axis("equal")
     ax.axis("off")
 
-    head_coord = (100, 100)
-    body_coord = (200, 200)
+    head_coord = [164.3398, 211.1895]
+    body_coord = [172.11444, 195.64024]
 
     map_head_coord = convert_coord(head_coord)
     map_body_coord = convert_coord(body_coord)
@@ -153,7 +172,7 @@ def main():
         map_body_coord,
     )
 
-    inverse_coord = select_short_coord(inverse_coord, origin)
+    inverse_coord = select_short_coord(inverse_coord, origin_coord)
 
     ax.scatter(
         map_head_coord[0],
@@ -173,6 +192,11 @@ def main():
         marker="x",
         color="orange",
     )
+
+    real_origin = convert_pixel_to_real_coord(origin_coord)
+    real_dest = convert_pixel_to_real_coord(inverse_coord)
+    print("real_origin: ", real_origin)
+    print("real_dest: ", real_dest)
 
     plt.axis("scaled")
     plt.show()
