@@ -4,4 +4,5 @@ Videos/
 .DS_Store
 url.json
 test_*.py
+.mypy_cache
 ```
