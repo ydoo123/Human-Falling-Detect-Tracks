@@ -17,7 +17,7 @@ from ActionsEstLoader import TSSTG
 import json
 import requests
 import uuid
-from Utils.convert_util import get_real_coord
+from Utils.convert_util import get_real_coord, dump_log
 
 # import playsound
 
@@ -331,12 +331,6 @@ if __name__ == "__main__":
             action_history = np.roll(action_history, -1)
             action_history[-1] = ACTION_DICT[action_name]
 
-            # if tracker.tracks[0].keypoints_list:
-            #     head_coord = tracker.tracks[0].keypoints_list[-1][0]
-            #     print(head_coord)
-            #     body_coord = tracker.tracks[0].keypoints_list[-1][8]
-            #     print(body_coord)
-
             if (
                 np.count_nonzero(action_history == 0) <= ACTION_COUNT_VALUE
                 and count == 0
@@ -350,6 +344,7 @@ if __name__ == "__main__":
                 x, y, z, w = get_real_coord(head_coord, body_coord)
 
                 print(head_coord, body_coord)
+                dump_log(head_coord, body_coord)
                 beep()
                 send_coord(x, y, z, w)
                 # upload_photo()

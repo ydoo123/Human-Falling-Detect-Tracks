@@ -14,6 +14,7 @@ CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 UPPER_PATH = os.path.dirname(CURRENT_PATH)
 MAP_PATH = os.path.join(UPPER_PATH, "Map")
 YAML_FILE = os.path.join(MAP_PATH, "map_112_0510.yaml")
+LOG_PATH = os.path.join(MAP_PATH, "coord_log.json")
 # Load the YAML file
 with open(YAML_FILE, "r") as stream:
     map_data = yaml.safe_load(stream)
@@ -35,6 +36,24 @@ with open(CAM_CONFIG_PATH, "r") as f:
     cam_vertices = np.array(cam_config_data["vertices"], np.float32)
     # rotate the cam_vertices
     cam_vertices = np.roll(cam_vertices, 1, axis=0)
+
+
+def get_head_body_coord():
+    with open(LOG_PATH, "r") as f:
+        log_data = json.load(f)
+        head_coord = log_data["head_coord"]
+        body_coord = log_data["body_coord"]
+    return head_coord, body_coord
+
+
+def dump_log(head_coord, body_coord):
+    log_data = {
+        "head_coord": head_coord,
+        "body_coord": body_coord,
+    }
+    with open(LOG_PATH, "w") as f:
+        json.dump(log_data, f, indent=4)
+    return None
 
 
 # get the image size
@@ -197,8 +216,7 @@ def main():
     ax.axis("equal")
     ax.axis("off")
 
-    head_coord = [164.3398, 211.1895]
-    body_coord = [172.11444, 195.64024]
+    head_coord, body_coord = get_head_body_coord()
 
     map_head_coord = convert_coord(head_coord)
     map_body_coord = convert_coord(body_coord)
