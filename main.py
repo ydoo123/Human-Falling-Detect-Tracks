@@ -4,6 +4,7 @@ import time
 import torch
 import argparse
 import numpy as np
+import math
 
 from Detection.Utils import ResizePadding
 from CameraLoader import CamLoader, CamLoader_Q
@@ -106,6 +107,31 @@ def kpt2bbox(kpt, ex=20):
             kpt[:, 1].max() + ex,
         )
     )
+
+
+def get_head_body(bbox):
+    point1 = (bbox[0], bbox[1])
+    point2 = (bbox[2], bbox[3])
+
+    width = abs(point1[0] - point2[0])
+    height = abs(point1[1] - point2[1])
+
+    if width <= height:
+        head_coord = ((point1[0] + point2[0]) / 2, point1[1])
+        body_coord = ((point1[0] + point1[0]) / 2, point2[1])
+
+    else:
+        head_coord = (point1[0], (point1[1] + point2[1]) / 2)
+        body_coord = (point2[0], (point1[1] + point2[1]) / 2)
+
+    return head_coord, body_coord
+
+
+def send_test():
+    head_coord = [415, 347]
+    body_coord = [328, 345]
+    x, y, z, w = get_real_coord(head_coord, body_coord)
+    send_coord(x, y, z, w)
 
 
 if __name__ == "__main__":
@@ -338,8 +364,10 @@ if __name__ == "__main__":
                 count += 1
                 action_history = np.zeros(ACTION_COUNT_VALUE)
                 print("Fall Down")
-                head_coord = tracker.tracks[0].keypoints_list[-1][0][:2].tolist()
-                body_coord = tracker.tracks[0].keypoints_list[-1][8][:2].tolist()
+
+                # head_coord, body_coord = get_head_body(bbox)
+                head_coord = [420, 318]
+                body_coord = [360, 318]
 
                 x, y, z, w = get_real_coord(head_coord, body_coord)
 

@@ -13,7 +13,7 @@ import math
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 UPPER_PATH = os.path.dirname(CURRENT_PATH)
 MAP_PATH = os.path.join(UPPER_PATH, "Map")
-YAML_FILE = os.path.join(MAP_PATH, "map_112_0510.yaml")
+YAML_FILE = os.path.join(MAP_PATH, "map_112_0516.yaml")
 LOG_PATH = os.path.join(MAP_PATH, "coord_log.json")
 # Load the YAML file
 with open(YAML_FILE, "r") as stream:
