@@ -5,4 +5,5 @@ Videos/
 url.json
 test_*.py
 .mypy_cache
+photo/
 ```
