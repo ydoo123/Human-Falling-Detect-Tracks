@@ -102,7 +102,7 @@ def get_center(head_x, head_y, body_x, body_y):
     return center_x, center_y
 
 
-def get_inverse_coord(head_coord, body_coord, meter=1.5):
+def get_inverse_coord(head_coord, body_coord, meter=3):
     midpoint = (
         (head_coord[0] + body_coord[0]) / 2,
         (head_coord[1] + body_coord[1]) / 2,
@@ -163,7 +163,7 @@ def convert_pixel_to_real_coord(pixel_coord):
     """
     # func(origin_coord) = (0, 0)
     real_x = (pixel_coord[0] - origin_coord[0]) * map_data["resolution"]
-    real_y = (pixel_coord[1] - origin_coord[1]) * map_data["resolution"]
+    real_y = -(pixel_coord[1] - origin_coord[1]) * map_data["resolution"]
 
     return real_x, real_y
 

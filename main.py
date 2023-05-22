@@ -23,6 +23,7 @@ from Utils.upload_image import upload_image
 
 # import playsound
 
+bbox = [0, 0, 0, 0]
 
 ACTION_DICT = {
     "pending..": 0,
@@ -110,9 +111,29 @@ def kpt2bbox(kpt, ex=20):
     )
 
 
+def reduce_size(head_coord, body_coord, ratio=0.7):
+    width = body_coord[0] - head_coord[0]
+    height = body_coord[1] - head_coord[1]
+
+    new_width = float(width * ratio)
+    new_height = float(height * ratio)
+
+    new_x1 = head_coord[0] + float((width - new_width) / 2)
+    new_y1 = head_coord[1] + float((height - new_height) / 2)
+    new_x2 = new_x1 + new_width
+    new_y2 = new_y1 + new_height
+
+    head_coord = (new_x1, new_y1)
+    body_coord = (new_x2, new_y2)
+
+    return head_coord, body_coord
+
+
 def get_head_body(bbox):
-    point1 = (bbox[0], bbox[1])
-    point2 = (bbox[2], bbox[3])
+    bbox = list(map(float, bbox))
+
+    point1 = (bbox[0] * 2, bbox[1] * 2)
+    point2 = (bbox[2] * 2, bbox[3] * 2)
 
     width = abs(point1[0] - point2[0])
     height = abs(point1[1] - point2[1])
@@ -124,6 +145,8 @@ def get_head_body(bbox):
     else:
         head_coord = (point1[0], (point1[1] + point2[1]) / 2)
         body_coord = (point2[0], (point1[1] + point2[1]) / 2)
+
+    head_coord, body_coord = reduce_size(head_coord, body_coord)
 
     return head_coord, body_coord
 
@@ -367,8 +390,15 @@ if __name__ == "__main__":
                 print("Fall Down")
 
                 # head_coord, body_coord = get_head_body(bbox)
-                head_coord = [420, 318]
-                body_coord = [360, 318]
+                head_coord = (
+                    tracker.tracks[0].keypoints_list[-1][0][:2].tolist()
+                )  # head
+                body_coord = (
+                    tracker.tracks[0].keypoints_list[-1][12][:2].tolist()
+                )  # body
+
+                head_coord = [float(i * 2) for i in head_coord]
+                body_coord = [float(i * 2) for i in body_coord]
 
                 x, y, z, w = get_real_coord(head_coord, body_coord)
 
