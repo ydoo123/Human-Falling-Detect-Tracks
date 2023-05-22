@@ -19,6 +19,7 @@ import json
 import requests
 import uuid
 from Utils.convert_util import get_real_coord, dump_log, cam_vertices
+from Utils.upload_image import upload_image
 
 # import playsound
 
@@ -375,7 +376,7 @@ if __name__ == "__main__":
                 dump_log(head_coord, body_coord)
                 beep()
                 send_coord(x, y, z, w)
-                # upload_photo()
+                upload_image(frame)
 
             prev_time = time.time()
 
