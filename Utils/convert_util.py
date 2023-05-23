@@ -80,7 +80,8 @@ def check_road(coord):
     Returns true if the given coord in the image is white, otherwise false
     """
     # get the color of the coord
-    color = img.getpixel(coord)
+    x, y = map(int, coord)
+    color = img.getpixel((x, y))
 
     # check the color
     if color == 255:
