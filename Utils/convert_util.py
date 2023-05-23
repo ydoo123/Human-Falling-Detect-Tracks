@@ -75,6 +75,19 @@ rectangle = plt.Polygon(
 ax.add_patch(rectangle)
 
 
+def check_road(coord):
+    """
+    Returns true if the given coord in the image is white, otherwise false
+    """
+    # get the color of the coord
+    color = img.getpixel(coord)
+
+    # check the color
+    if color == 255:
+        return True
+    return False
+
+
 def convert_coord(coord):
     """
     convert the camera coordinate to map coordinate(pixel, pixel)
@@ -149,6 +162,12 @@ def select_short_coord(inverse_coord, origin_coord):
         (inverse_coord_2[0] - origin_coord[0]) ** 2
         + (inverse_coord_2[1] - origin_coord[1]) ** 2
     ) ** 0.5
+
+    if check_road(inverse_coord_1) is False:
+        return inverse_coord_2
+
+    if check_road(inverse_coord_2) is False:
+        return inverse_coord_1
 
     if distance_1 <= distance_2:
         return inverse_coord_1
