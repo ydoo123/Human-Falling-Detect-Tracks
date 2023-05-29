@@ -24,6 +24,7 @@ from Utils.upload_image import upload_image
 # import playsound
 
 bbox = [0, 0, 0, 0]
+action_arr = []
 
 ACTION_DICT = {
     "pending..": 0,
@@ -257,6 +258,7 @@ if __name__ == "__main__":
     fps_time = 0
     whole_frame = 0
     while cam.grabbed():
+        action_arr = []
         whole_frame += 1
         frame = cam.getitem()
         image = frame.copy()
@@ -314,6 +316,7 @@ if __name__ == "__main__":
             center = track.get_center().astype(int)
 
             action = "pending.."
+
             clr = (0, 255, 0)
             # Use 30 frames time-steps to prediction.
             if len(track.keypoints_list) == 30:
@@ -321,6 +324,7 @@ if __name__ == "__main__":
                 out = action_model.predict(pts, frame.shape[:2])
                 action_name = action_model.class_names[out[0].argmax()]
                 action = "{}: {:.2f}%".format(action_name, out[0].max() * 100)
+                action_arr.append(ACTION_DICT[action_name])
                 if action_name == "Fall Down":
                     clr = (255, 0, 0)
                 elif action_name == "Lying Down":
@@ -380,10 +384,12 @@ if __name__ == "__main__":
 
             action_history = np.roll(action_history, -1)
             action_history[-1] = ACTION_DICT[action_name]
+            print(action_arr)
 
             if (
                 np.count_nonzero(action_history == 0) <= ACTION_COUNT_VALUE
                 and count == 0
+                and not args.test
             ):
                 count += 1
                 action_history = np.zeros(ACTION_COUNT_VALUE)
@@ -394,13 +400,14 @@ if __name__ == "__main__":
                     tracker.tracks[0].keypoints_list[-1][0][:2].tolist()
                 )  # head
                 body_coord = (
-                    tracker.tracks[0].keypoints_list[-1][12][:2].tolist()
+                    tracker.tracks[0].keypoints_list[-1][10][:2].tolist()  # len() = 12
                 )  # body
 
                 head_coord = [float(i * 2) for i in head_coord]
                 body_coord = [float(i * 2) for i in body_coord]
 
-                x, y, z, w = get_real_coord(head_coord, body_coord)
+                # x, y, z, w = get_real_coord(head_coord, body_coord)
+                x, y, z, w = (4.0, -0.5, 0.0, 1.0)  # test
 
                 print(head_coord, body_coord)
                 dump_log(head_coord, body_coord)
