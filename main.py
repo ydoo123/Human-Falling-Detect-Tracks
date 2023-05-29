@@ -383,8 +383,12 @@ if __name__ == "__main__":
             """
 
             action_history = np.roll(action_history, -1)
-            action_history[-1] = ACTION_DICT[action_name]
-            print(action_arr)
+            action_result = 0
+
+            if len(action_arr) > 0:
+                action_result = max(action_arr)
+
+            action_history[-1] = action_result
 
             if (
                 np.count_nonzero(action_history == 0) <= ACTION_COUNT_VALUE
