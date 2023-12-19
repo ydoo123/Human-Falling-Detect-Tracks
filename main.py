@@ -37,12 +37,16 @@ ACTION_DICT = {
     "Fall Down": 1,
 }
 
+"""
 # get url from url.json
 with open("url.json") as f:
     URL = json.load(f)
     URL = URL["url"]
+"""
 
-source = 2  # 2 for usb_cam
+URL = "000.000.000.000"
+
+source = 1  # 2 for usb_cam
 
 SAVE_FRAME_RATE = 20  # 20 is good and 30 is too fast
 ACTION_CHECK_RATE = 0.1  # to check action every 0.1 second
@@ -414,10 +418,10 @@ if __name__ == "__main__":
                 x, y, z, w = (4.0, -0.5, 0.0, 1.0)  # test
 
                 print(head_coord, body_coord)
-                dump_log(head_coord, body_coord)
+                #dump_log(head_coord, body_coord)
                 beep()
-                send_coord(x, y, z, w)
-                upload_image(frame)
+                #send_coord(x, y, z, w)
+                #upload_image(frame)
 
             prev_time = time.time()
 
